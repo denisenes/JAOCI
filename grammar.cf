@@ -1,0 +1,70 @@
+-- Global
+PDefs. Program ::= [Def] ;
+
+DefFun. Def ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+terminator Def "" ;
+
+ArgDecl. Arg ::= Type Id ;
+separator Arg "," ;
+
+-- Statements
+StmExp.    Stm ::= Exp ";" ;
+StmDecls.  Stm ::= Type [Id] ";" ;
+StmInit.   Stm ::= Type Id "=" Exp ";" ;
+StmReturn. Stm ::= "return" Exp ";" ;
+StmWhile.  Stm ::= "while" "(" Exp ")" Stm ;
+StmBlock.  Stm ::= "{" [Stm] "}" ;
+StmIfElse. Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
+terminator Stm "" ;
+
+-- Expressions
+ExpBool.   Exp6 ::= BoolLiteral ;
+ExpInt.    Exp6 ::= Integer ;
+ExpDouble. Exp6 ::= Double  ;
+
+ExpId.  Exp6 ::= Id      ;
+ExpApp. Exp6 ::= Id "(" [Exp] ")" ;
+
+ExpPost. Exp6 ::= Id IncDecOp ;
+ExpPre.  Exp6 ::= IncDecOp Id ;
+
+ExpMul. Exp5 ::= Exp5 MulOp Exp6 ;
+ExpAdd. Exp4 ::= Exp4 AddOp Exp5 ;
+ExpCmp. Exp3 ::= Exp4 CmpOp Exp4 ;
+
+ExpAnd. Exp2 ::= Exp2 "&&" Exp3 ;
+ExpOr.  Exp1 ::= Exp1 "||" Exp2 ;
+
+ExpAssg. Exp ::= Id "=" Exp ;
+
+coercions Exp 6 ;
+separator Exp "," ;
+
+-- Operators
+OpInc.   IncDecOp ::=  "++" ;
+OpDec.   IncDecOp ::=  "--" ;
+OpTimes. MulOp ::=  "*"  ;
+OpDiv.   MulOp ::=  "/"  ;
+OpPlus.  AddOp ::=  "+"  ;
+OpMinus. AddOp ::=  "-"  ;
+OpLt.    CmpOp ::=  "<"  ;
+OpGt.    CmpOp ::=  ">"  ;
+OpLtEq.  CmpOp ::=  "<=" ;
+OpGtEq.  CmpOp ::=  ">=" ;
+OpEq.    CmpOp ::=  "==" ;
+OpNEq.   CmpOp ::=  "!=" ;
+
+-- Boolean literals
+LTrue.  BoolLiteral ::= "true" ;
+LFalse. BoolLiteral ::= "false" ;
+
+-- Types
+rules Type ::= "bool" | "int" | "double" | "void" ;
+
+-- Ids
+token Id (letter (letter | digit | '_')*) ;
+separator nonempty Id "," ;
+
+comment "#" ;
+comment "//" ;
+comment "/*" "*/" ;
