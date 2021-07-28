@@ -31,13 +31,13 @@ run mode s = let ast = pProgram (myLLexer s) in case ast of
                     putStrLn "Parser: OK"
                     case checkProgram tree of
                         Bad err -> do
-                                putStrLn "Typechecker: ERROR"
-                                putStrLn err
-                                exitFailure
+                              putStrLn "Typechecker: ERROR"
+                              putStrLn err
+                              exitFailure
                         Ok _ -> do
-                                putStrLn "Typechecker: OK"
-                                showTree mode tree
-                                exitSuccess
+                              putStrLn "Typechecker: OK"
+                              showTree mode tree
+                              exitSuccess
 
 
 showTree :: DebugMode -> Program -> IO ()

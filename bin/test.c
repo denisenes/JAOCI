@@ -1,5 +1,7 @@
-int test(int i) {
+int test(int i, int j) {
 	i = i + 1;
+	j = 2;
+	i = i + j;
 	return i;
 }
 
@@ -13,4 +15,9 @@ int main () {
 		test(b);
 	}
 	return 0;
+}
+
+void nothing() {
+	int aboba;
+	aboba = 1;
 }

@@ -35,3 +35,12 @@ instance MonadPlus Err where
 instance Alternative Err where
   empty = mzero
   (<|>) = mplus
+
+-- that's sooooo clever but i need this :(
+isBad:: Err a -> Bool
+isBad (Bad _) = True
+isBad (Ok _) = False
+
+isOk:: Err a -> Bool
+isOk (Ok _) = True
+isOk (Bad _) = False
