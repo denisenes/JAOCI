@@ -40,7 +40,7 @@ run mode s = let ast = pProgram (myLLexer s) in case ast of
                               exitSuccess
 
 
-showTree :: DebugMode -> Program -> IO ()
+showTree :: (Show a) => DebugMode -> a -> IO ()
 showTree mode tree = do
   putStrMode mode $ "\n[Abstract Syntax Tree]\n\n" ++ show tree
 
@@ -50,6 +50,11 @@ main = do
   case args of
     [] -> hGetContents stdin >>= run True -- read from stdin
     fs -> mapM_ (runFile True) fs         -- read from file
+
+
+
+
+
 
 
 --debug stuff

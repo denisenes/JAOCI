@@ -5,7 +5,7 @@ int test(int i, int j) {
 	return i;
 }
 
-int main () {
+int main (int argc) {
 	int a = 10;
 	int b = 11;
 	a = a + b;
@@ -17,7 +17,8 @@ int main () {
 	return 0;
 }
 
-void nothing() {
+void nothing(double kuku, double kuku2) {
 	int aboba;
+	int sassy = 100;
 	aboba = 1;
 }
