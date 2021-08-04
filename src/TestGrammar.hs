@@ -23,21 +23,21 @@ runFile mode f = putStrLn f >> readFile f >>= run mode
 
 run :: DebugMode -> String -> IO ()
 run mode s = let ast = pProgram (myLLexer s) in case ast of
-           Bad err -> do 
-                    putStrLn "Parser: ERROR"
-                    putStrLn err
-                    exitFailure
-           Ok tree -> do 
-                    putStrLn "Parser: OK"
-                    case checkProgram tree of
-                        Bad err -> do
-                              putStrLn "Typechecker: ERROR"
-                              putStrLn err
-                              exitFailure
-                        Ok _ -> do
-                              putStrLn "Typechecker: OK"
-                              showTree mode tree
-                              exitSuccess
+      Bad err -> do 
+            putStrLn "Parser: ERROR"
+            putStrLn err
+            exitFailure
+      Ok tree -> do 
+            putStrLn "Parser: OK"
+            case checkProgram tree of
+                  Bad err -> do
+                        putStrLn "Typechecker: ERROR"
+                        putStrLn err
+                        exitFailure
+                  Ok _ -> do
+                        putStrLn "Typechecker: OK"
+                        showTree mode tree
+                        exitSuccess
 
 
 showTree :: (Show a) => DebugMode -> a -> IO ()

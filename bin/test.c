@@ -10,15 +10,20 @@ int main (int argc) {
 	int b = 11;
 	a = a + b;
 	if (a > 0) {
-		test(a);
+		test(a, b);
 	} else {
-		test(b);
+		test(b, a);
 	}
+	double fortnite = 4.0;
+	double balls = 2.0;
+	nothing(fortnite, balls);
+	a = nothing(fortnite, balls) + test(a, b); 
 	return 0;
 }
 
-void nothing(double kuku, double kuku2) {
-	int aboba;
-	int sassy = 100;
-	aboba = 1;
+int nothing(double kuku, double kuku2) {
+	double aboba = (++kuku) + (kuku2++);
+	int sassy = aboba * kuku + (kuku2 * true);
+	aboba = 100.0;
+	return 1;
 }
