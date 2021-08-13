@@ -20,6 +20,10 @@ lookVar (_, stack) id = lookFrame stack id where
                                    if res /= Nothing then res
                                    else lookFrame tail id
 
+-- look variable only in the top frame
+lookVar2:: Env -> Id -> Maybe Type
+lookVar2 (_, top:_) id = Map.lookup id top
+
 
 -- look for a function signature in the environment
 lookFun:: Env -> Id -> Maybe ([Type],Type)
