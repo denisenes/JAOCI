@@ -8,8 +8,10 @@ import Generated.LexGrammar
 import Generated.ParGrammar
 import Generated.ErrM
 import TypeChecker
-import AbsGrammar
 import CheckUtils
+import AbsGrammar
+import Interpreter
+import InterpUtils
 
 myLLexer = myLexer
 
@@ -52,19 +54,13 @@ main = do
     fs -> mapM_ (runFile True) fs         -- read from file
 
 
+--DEBUG STUFF--
+ee = emptyIEnv
 
+env1 = extendVar ee (Id "x") (Int 123) 
 
+env2 = extendFun env1 (DefFun Type_int (Id "main") [ArgDecl Type_int (Id "argc")] [StmBlock []])
 
+env3 = extendVar (callPush env1) (Id "y") (Double 2.31)
 
-
---debug stuff
-env::Env
-env = emptyEnv
-
-env1::Env
-env1 = updateVar env (Id "val") Type_int
-
-env2::Env
-env2 = updateVar (updateFun env1 (Id "main") ([Type_bool, Type_int], Type_void)) (Id "a") Type_bool
-
-env3 = updateVar (newBlock (updateVar (newBlock env2) (Id "b") Type_double)) (Id "arr") Type_void
+env4 = extendVar (newScope env3) (Id "z") (Bool True)

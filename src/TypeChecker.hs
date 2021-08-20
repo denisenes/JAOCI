@@ -10,6 +10,7 @@ import CheckUtils
 type Result = Err String
 
 -- Result combinator
+--TODO use monad computation instead of this shit
 (<++>):: Result -> Result -> Result
 (<++>) (Ok a) (Ok b) = Ok (a ++ "\n" ++ b)     --OOOOO PaTtErN mAtChInG 0_O
 (<++>) (Bad a) (Bad b) = Bad (a ++ "\n" ++ b)
@@ -64,8 +65,6 @@ checkStm (env, retype) s = case s of
       StmExp exp -> do
             inferExp env exp
             return env
-      -- TODO are u crazy, what about checking if the variable was declared before mmmmmm?????????
-      -- i'm such a dick!!!
       StmDecls type_ ids -> do
             checkDeclared env ids
             Ok (foldl (\e id -> updateVar e id type_) env ids) -- update environment
@@ -75,7 +74,7 @@ checkStm (env, retype) s = case s of
             let newenv = updateVar env id type_
             return newenv
       StmReturn exp -> do                                                -- check returning type
-            checkExp env retype exp -- i'm not sure here, i'll test it   
+            checkExp env retype exp
             return env
       StmWhile exp stm -> do                                             -- just check exp and stm
             inferExp env exp
