@@ -91,8 +91,8 @@ checkStm (env, retype) s = case s of
       checkDeclared:: Env -> [Id] -> Result
       checkDeclared _ [] = Ok "declared"        
       checkDeclared env (id:tail) = case lookVar2 env id of
-                                          Nothing -> checkDeclared env tail
-                                          Just _ -> Bad (" * Variable " ++ (show id) ++ " was redeclared")
+            Nothing -> checkDeclared env tail
+            Just _ -> Bad (" * Variable " ++ (show id) ++ " was redeclared")
 
 checkExp :: Env -> Type -> Exp -> Result
 checkExp env type_ exp = do
@@ -106,20 +106,40 @@ inferExp env x = case x of
       ExpDouble double -> return Type_double
       ExpId id -> inferId env id
       ExpApp id exps -> inferApp env id exps
-      ExpPost id incdecop -> isNotBool $ (inferId env id)
-      ExpPre incdecop id -> isNotBool $ (inferId env id)
+      ExpPost id incdecop -> isNumeric $ inferId env id
+      ExpPre incdecop id -> isNumeric $ inferId env id
       ExpMul exp1 mulop exp2 -> inferArithmBin env exp1 exp2
       ExpAdd exp1 addop exp2 -> inferArithmBin env exp1 exp2
-      ExpCmp exp1 cmpop exp2 -> inferArithmBin env exp1 exp2
-      ExpAnd exp1 exp2 -> inferArithmBin env exp1 exp2
-      ExpOr exp1 exp2 -> inferArithmBin env exp1 exp2
+      ExpCmp exp1 cmpop exp2 -> case cmpop of
+            OpEq -> inferArithmBin env exp1 exp2
+            OpNEq -> inferArithmBin env exp1 exp2
+            _ -> do
+                  isNumeric $ inferExp env exp1
+                  isNumeric $ inferExp env exp2
+                  inferArithmBin env exp1 exp2
+      ExpAnd exp1 exp2 -> do
+                          isNotDouble $ inferExp env exp1
+                          isNotDouble $ inferExp env exp2
+                          inferArithmBin env exp1 exp2
+      ExpOr exp1 exp2 -> do
+                          isNotDouble $ inferExp env exp1
+                          isNotDouble $ inferExp env exp2
+                          inferArithmBin env exp1 exp2
       ExpAssg id exp -> inferAssg env id exp
       where
-      isNotBool:: Err Type -> Err Type
-      isNotBool type_ = case type_ of
-                              Bad str -> Bad str
-                              Ok Type_bool -> Bad " * Unresolved operation in boolean expression"
-                              Ok t -> return t 
+      isNumeric:: Err Type -> Err Type
+      isNumeric type_ = case type_ of
+            Bad str -> Bad str
+            Ok Type_double -> return Type_double
+            Ok Type_int -> return Type_int
+            Ok _ -> Bad " * Unresolved operation in expression" 
+      isNotDouble:: Err Type -> Err Type
+      isNotDouble type_ = case type_ of
+            Bad str -> Bad str
+            Ok Type_double -> Bad " * Unexpected double expression in and/or operation"
+            anyother -> anyother
+
+
 
 inferAssg:: Env -> Id -> Exp -> Err Type
 inferAssg env id exp = do

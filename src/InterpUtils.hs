@@ -1,12 +1,47 @@
 module InterpUtils where
 
+import Data.Bits
 import Data.Map (Map)
 import qualified Data.Map as Map
 
 import AbsGrammar
 
-data Value = Int Int | Double Double | Bool Bool | Void
-    deriving Show
+data Value = Int Integer | Double Double | Bool Bool | Void
+    deriving (Show, Ord, Eq)
+
+instance Num Value where
+    -- a + b --
+   (Int a) + (Int b) = Int $ a + b
+   (Double a) + (Int b) = Double $ a + (fromIntegral b) -- for inc and dec
+   (Double a) + (Double b) = Double $ a + b
+   (Bool a) + (Bool b) = Bool $ a || b
+    -- a * b --
+   (Int a) * (Int b) = Int $ a * b
+   (Double a) * (Double b) = Double $ a * b
+   (Bool a) * (Bool b) = Bool $ a && b
+    -- a - b --
+   (Int a) - (Int b) = Int $ a - b
+   (Double a) - (Int b) = Double $ a - (fromIntegral b) -- for inc and dec
+   (Double a) - (Double b) = Double $ a - b
+   (Bool a) - (Bool b) = Bool $ a && (not b)
+   --abs
+   --signum
+   fromInteger int = Int int
+
+
+
+vdiv:: Value -> Value -> Value
+vdiv (Int a) (Int b) = Int (a `div` b)
+vdiv (Double a) (Double b) = Double (a / b)
+
+vand:: Value -> Value -> Value
+vand (Int int1) (Int int2) = Int (int1 .&. int2)
+vand (Bool bool1) (Bool bool2) = Bool $ bool1 && bool2
+
+-- HE'LL STEAL YOUR CUCUMBER!!!
+vor:: Value -> Value -> Value
+vor (Int int1) (Int int2) = Int (int1 .|. int2)
+vor (Bool bool1) (Bool bool2) = Bool $ bool1 || bool2
 
 type IEnv = (Map Id Fun, CallStack)
 type CallStack = [ScopeStack]
