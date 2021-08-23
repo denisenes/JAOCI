@@ -33,11 +33,13 @@ run mode s = let ast = pProgram (myLLexer s) in case ast of
             putStrLn "Parser: OK"
             case checkProgram tree of
                   Bad err -> do
-                        putStrLn "Typechecker: ERROR"
+                        putStrLn "Typechecker: ERROR\n"
                         putStrLn err
                         exitFailure
                   Ok _ -> do
                         putStrLn "Typechecker: OK"
+                        let res = execProg tree
+                        putStrLn (show res)
                         showTree mode tree
                         exitSuccess
 
@@ -61,6 +63,7 @@ env1 = extendVar ee (Id "x") (Int 123)
 
 env2 = extendFun env1 (DefFun Type_int (Id "main") [ArgDecl Type_int (Id "argc")] [StmBlock []])
 
-env3 = extendVar (callPush env1) (Id "y") (Double 2.31)
+
+env3 = extendVar (callPush env1 [ArgDecl Type_int (Id "a"), ArgDecl Type_int (Id "b"), ArgDecl Type_int (Id "c")] [Int 1, Int 4, Int 5]) (Id "y") (Double 2.31)
 
 env4 = extendVar (newScope env3) (Id "z") (Bool True)

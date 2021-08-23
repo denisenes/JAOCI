@@ -12,7 +12,7 @@ eval env exp = case exp of
     ExpInt integer -> (Int integer, env)
     ExpDouble double -> (Double double, env)
     ExpId id -> let (Just val) = (lookIVar env id) in (val, env)
-    ExpApp id exps -> (Int 0, env)                              -- !!!dummy!!!
+    ExpApp id exps -> (call env id exps, env)
     ExpPost id incdecop -> (post_val, post_env)
         where
         post_val = let (Just value) = lookIVar env id in value
@@ -58,8 +58,36 @@ eval env exp = case exp of
         (val2, env2) = eval env1 exp2
     ExpAssg id exp -> let (val, env1) = eval env exp in
         (val, extendVar env1 id val)
-    
 
---Env exec (Env env, Statement s)
+call:: IEnv -> Id -> [Exp] -> Value
+call env id exps = ret_result
+    where
+    newenv = callPush env1 args vals
+    ret_result = execStms newenv stms
+    (Just (args, stms)) = lookIFun env id
+    (vals, env1) = foldl (\x y -> lamda x y) ([], env) exps
+    lamda (acc, penv) exp = let (val, nenv) = eval penv exp in ((val:acc), nenv)
+
+--Env exec (Env env, [Stm] s)
+execStms:: IEnv -> [Stm] -> Value
+execStms env [] = Void
+execStms env (stm:tail) = case stm of
+        StmReturn exp -> let (val, _) = eval env exp in val
+        _ -> execStms newenv tail
+        where newenv = exec env stm
+        
+
+--Env exec (Env env, Stm s)
+exec:: IEnv -> Stm -> IEnv
+exec env stm = env
+
 
 --Void exec (Program p)
+execProg:: Program -> Value -- returns exit code of main
+execProg (PDefs prog) = let env = makeEnv emptyIEnv prog in
+    call env (Id "main") []
+    where
+    makeEnv:: IEnv -> [Def] -> IEnv  -- extends environment with function definitions
+    makeEnv env [] = env
+    makeEnv env (def:tail) = let newenv = extendFun env def in
+        makeEnv newenv tail

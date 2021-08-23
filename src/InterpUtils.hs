@@ -77,8 +77,13 @@ extendFun (funcs, vars) (DefFun _ id args stms) = (new_funcs, vars)
     new_funcs = Map.insert id (args, stms) funcs
 
 --Env callPush (Env env)
-callPush:: IEnv -> IEnv
-callPush (fs, calls) = (fs, ([Map.empty]:calls))
+callPush:: IEnv -> [Arg] -> [Value] -> IEnv
+callPush (fs, calls) args vals = let mapka = extendArgs args vals in
+    (fs, ([mapka]:calls))
+    where
+    extendArgs:: [Arg] -> [Value] -> Map Id Value
+    extendArgs [] [] = Map.empty
+    extendArgs ((ArgDecl _ id):tail1) (val:tail2) = Map.insert id val (extendArgs tail1 tail2)
 
 --Env newScope (Env env)
 newScope:: IEnv -> IEnv

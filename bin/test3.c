@@ -18,7 +18,7 @@ int main() {
 		
 	}
 
-	int y, z, x;
+	int y, z;
 
 	return 0;
 }
