@@ -6,7 +6,7 @@ import qualified Data.Map as Map
 
 import AbsGrammar
 
-data Value = Int Integer | Double Double | Bool Bool | Void
+data Value = Int Integer | Double Double | Bool Bool | Void | Undef
     deriving (Show, Ord, Eq)
 
 instance Num Value where

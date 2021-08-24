@@ -63,26 +63,37 @@ call:: IEnv -> Id -> [Exp] -> Value
 call env id exps = ret_result
     where
     newenv = callPush env1 args vals
-    ret_result = execStms newenv stms
+    (ret_result, _) = execBlock newenv stms
     (Just (args, stms)) = lookIFun env id
     (vals, env1) = foldl (\x y -> lamda x y) ([], env) exps
     lamda (acc, penv) exp = let (val, nenv) = eval penv exp in ((val:acc), nenv)
 
---Env exec (Env env, [Stm] s)
-execStms:: IEnv -> [Stm] -> Value
-execStms env [] = Void
-execStms env (stm:tail) = case stm of
-        StmReturn exp -> let (val, _) = eval env exp in val
-        _ -> execStms newenv tail
-        where newenv = exec env stm
+execBlock:: IEnv -> [Stm] -> (Value, IEnv)
+execBlock env [] = (Undef, env)
+execBlock env (stm:tail) = case v of
+    Undef -> execBlock newenv tail
+    _ -> (v, newenv)
+    where (v, newenv) = exec env stm
         
 
---Env exec (Env env, Stm s)
-exec:: IEnv -> Stm -> IEnv
-exec env stm = env
+exec:: IEnv -> Stm -> (Value, IEnv)
+exec env stm = case stm of
+    StmExp exp -> let (_, newenv) = eval env exp in (Undef, newenv)
+    StmDecls _ ids -> (Undef, foldl (\e i -> extendVar e i Undef) env ids)
+    StmInit _ id exp -> let (v, e) = eval env exp in (Undef, extendVar e id v)
+    StmWhile exp stm1 -> let ((Bool bval), e) = eval env exp in
+        if bval then let (vl, el) = exec e stm1 in case vl of
+            Undef -> exec el stm
+            _ -> (vl, el)
+        else (Undef, e)
+    StmBlock stms -> let newenv = newScope env in
+        execBlock newenv stms
+        --foldl (\e s -> exec e s) newenv stms
+    StmIfElse exp stm1 stm2 -> let ((Bool bval), e) = eval env exp in
+        if bval then exec e stm1 else exec e stm2
+    StmReturn exp -> let (val, newenv) = eval env exp in (val, newenv)
 
 
---Void exec (Program p)
 execProg:: Program -> Value -- returns exit code of main
 execProg (PDefs prog) = let env = makeEnv emptyIEnv prog in
     call env (Id "main") []

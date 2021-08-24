@@ -15,6 +15,17 @@ import InterpUtils
 
 myLLexer = myLexer
 
+-- Global
+-- TODO: negative integer literals parsing
+
+-- Typechecker:
+-- TODO: normal error messaging
+-- TODO: make type Result = Err () (i don't need any data in the positive Result case)
+
+-- Interpreter:
+-- TODO: IO built-in functions
+-- TODO: return stms checking
+
 type DebugMode = Bool
 
 putStrMode :: DebugMode -> String -> IO ()
@@ -37,7 +48,7 @@ run mode s = let ast = pProgram (myLLexer s) in case ast of
                         putStrLn err
                         exitFailure
                   Ok _ -> do
-                        putStrLn "Typechecker: OK"
+                        putStrLn "Typechecker: OK\n"
                         let res = execProg tree
                         putStrLn (show res)
                         showTree mode tree
@@ -62,7 +73,6 @@ ee = emptyIEnv
 env1 = extendVar ee (Id "x") (Int 123) 
 
 env2 = extendFun env1 (DefFun Type_int (Id "main") [ArgDecl Type_int (Id "argc")] [StmBlock []])
-
 
 env3 = extendVar (callPush env1 [ArgDecl Type_int (Id "a"), ArgDecl Type_int (Id "b"), ArgDecl Type_int (Id "c")] [Int 1, Int 4, Int 5]) (Id "y") (Double 2.31)
 

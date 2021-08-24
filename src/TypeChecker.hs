@@ -77,7 +77,8 @@ checkStm (env, retype) s = case s of
             checkExp env retype exp
             return env
       StmWhile exp stm -> do                                             -- just check exp and stm
-            inferExp env exp
+            t <- inferExp env exp
+            --TODO bool check
             checkStm (env, retype) stm
       StmBlock stms -> do
             let newenv = newBlock env
